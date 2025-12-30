@@ -7,15 +7,28 @@ from . import crud, models, schemas
 from .database import SessionLocal, engine
 import os
 
-models.Base.metadata.create_all(bind=engine)
+from pathlib import Path
+
+# Safe DB Init
+try:
+    models.Base.metadata.create_all(bind=engine)
+except Exception as e:
+    print(f"Error creating database tables: {e}")
 
 app = FastAPI(title="Simply Course")
 
+# Get absolute path to current directory
+BASE_DIR = Path(__file__).resolve().parent
+
 # Mount static files
-app.mount("/static", StaticFiles(directory="app/static"), name="static")
+app.mount("/static", StaticFiles(directory=str(BASE_DIR / "static")), name="static")
 
 # Templates
-templates = Jinja2Templates(directory="app/templates")
+templates = Jinja2Templates(directory=str(BASE_DIR / "templates"))
+
+@app.get("/ping")
+def ping():
+    return {"status": "ok"}
 
 # Dependency
 def get_db():
