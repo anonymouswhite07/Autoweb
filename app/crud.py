@@ -1,26 +1,34 @@
 from sqlalchemy.orm import Session
-from . import models, schemas
-from slugify import slugify
-import uuid
+from .models import Course
+import re
 
-def get_course(db: Session, slug: str):
-    return db.query(models.Course).filter(models.Course.slug == slug).first()
+def slugify(text: str):
+    text = text.lower()
+    text = re.sub(r'[^a-z0-9\s-]', '', text)
+    return re.sub(r'\s+', '-', text).strip('-')
 
-def get_courses(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(models.Course).order_by(models.Course.created_at.desc()).offset(skip).limit(limit).all()
+def create_course(db: Session, course):
+    slug = slugify(course.title)
 
-def create_course(db: Session, course: schemas.CourseCreate):
-    base_slug = slugify(course.title)
-    slug = base_slug
-    
-    # Simple uniqueness check
-    counter = 1
-    while db.query(models.Course).filter(models.Course.slug == slug).first():
-        slug = f"{base_slug}-{counter}"
-        counter += 1
-        
-    db_course = models.Course(**course.dict(), slug=slug)
+    existing = db.query(Course).filter(Course.slug == slug).first()
+    if existing:
+        return existing
+
+    db_course = Course(
+        title=course.title,
+        slug=slug,
+        description=course.description,
+        rating=course.rating,
+        instructor=course.instructor,
+        udemy_link=course.udemy_link,
+    )
     db.add(db_course)
     db.commit()
     db.refresh(db_course)
     return db_course
+
+def get_courses(db: Session):
+    return db.query(Course).order_by(Course.created_at.desc()).all()
+
+def get_course(db: Session, slug: str):
+    return db.query(Course).filter(Course.slug == slug).first()

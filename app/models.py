@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Float, DateTime, Text
+from sqlalchemy import Column, Integer, String, DateTime
 from datetime import datetime
 from .database import Base
 
@@ -6,14 +6,10 @@ class Course(Base):
     __tablename__ = "courses"
 
     id = Column(Integer, primary_key=True, index=True)
-    title = Column(String, index=True, nullable=False)
-    slug = Column(String, unique=True, index=True, nullable=False)
-    description = Column(Text, nullable=True)
-    duration = Column(String, nullable=True)
-    lectures = Column(Integer, default=0)
-    assignments = Column(Integer, default=0)
-    rating = Column(Float, default=0.0)
-    instructor = Column(String, nullable=True)
-    udemy_link = Column(String, nullable=False)
-    tags = Column(String, nullable=True)  # Comma-separated or JSON string
+    title = Column(String, nullable=False)
+    slug = Column(String, unique=True, index=True)
+    description = Column(String)
+    rating = Column(String)
+    instructor = Column(String)
+    udemy_link = Column(String)
     created_at = Column(DateTime, default=datetime.utcnow)

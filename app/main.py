@@ -1,36 +1,22 @@
-from fastapi import FastAPI, Depends, HTTPException, Request
-from fastapi.staticfiles import StaticFiles
+from fastapi import FastAPI, Depends, HTTPException
+from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
-from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
-from . import crud, models, schemas
+from starlette.requests import Request
+
 from .database import SessionLocal, engine
-import os
+from .models import Base
+from .schemas import CourseCreate
+from .crud import create_course, get_courses, get_course
 
-from pathlib import Path
+Base.metadata.create_all(bind=engine)
 
-# Safe DB Init
-try:
-    models.Base.metadata.create_all(bind=engine)
-except Exception as e:
-    print(f"Error creating database tables: {e}")
+app = FastAPI()
+templates = Jinja2Templates(directory="app/templates")
 
-app = FastAPI(title="Simply Course")
+app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
-# Get absolute path to current directory
-BASE_DIR = Path(__file__).resolve().parent
-
-# Mount static files
-app.mount("/static", StaticFiles(directory=str(BASE_DIR / "static")), name="static")
-
-# Templates
-templates = Jinja2Templates(directory=str(BASE_DIR / "templates"))
-
-@app.get("/ping")
-def ping():
-    return {"status": "ok"}
-
-# Dependency
 def get_db():
     db = SessionLocal()
     try:
@@ -38,32 +24,33 @@ def get_db():
     finally:
         db.close()
 
-# API Endpoints
-@app.post("/api/courses", response_model=schemas.Course)
-def create_course(course: schemas.CourseCreate, db: Session = Depends(get_db)):
-    return crud.create_course(db=db, course=course)
+# API
+@app.post("/api/courses")
+def add_course(course: CourseCreate, db: Session = Depends(get_db)):
+    return create_course(db, course)
 
-@app.get("/api/courses", response_model=list[schemas.Course])
-def read_courses(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    courses = crud.get_courses(db, skip=skip, limit=limit)
-    return courses
-
-@app.get("/api/course/{slug}", response_model=schemas.Course)
-def read_course(slug: str, db: Session = Depends(get_db)):
-    db_course = crud.get_course(db, slug=slug)
-    if db_course is None:
-        raise HTTPException(status_code=404, detail="Course not found")
-    return db_course
-
-# Web Pages
+# Pages
 @app.get("/", response_class=HTMLResponse)
-async def read_root(request: Request, db: Session = Depends(get_db)):
-    courses = crud.get_courses(db, limit=20)
-    return templates.TemplateResponse("index.html", {"request": request, "courses": courses})
+def home(request: Request, db: Session = Depends(get_db)):
+    courses = get_courses(db)
+    return templates.TemplateResponse("home.html", {
+        "request": request,
+        "courses": courses
+    })
 
 @app.get("/course/{slug}", response_class=HTMLResponse)
-async def course_detail(request: Request, slug: str, db: Session = Depends(get_db)):
-    course = crud.get_course(db, slug=slug)
+def course_page(slug: str, request: Request, db: Session = Depends(get_db)):
+    course = get_course(db, slug)
     if not course:
-        return templates.TemplateResponse("404.html", {"request": request}, status_code=404)
-    return templates.TemplateResponse("detail.html", {"request": request, "course": course})
+        raise HTTPException(status_code=404)
+    return templates.TemplateResponse("course.html", {
+        "request": request,
+        "course": course
+    })
+
+@app.get("/go/{slug}")
+def redirect_to_udemy(slug: str, db: Session = Depends(get_db)):
+    course = get_course(db, slug)
+    if not course:
+        raise HTTPException(status_code=404)
+    return RedirectResponse(course.udemy_link)
