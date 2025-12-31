@@ -1,6 +1,9 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="container">
+    <h2>Search results for “{{ query }}”</h2>
+
+    {% if courses %}
     {% for course in courses %}
     <div class="course-card">
         {% if course.image %}
@@ -18,5 +21,8 @@
         </div>
     </div>
     {% endfor %}
+    {% else %}
+    <p>No courses found.</p>
+    {% endif %}
 </div>
 {% endblock %}

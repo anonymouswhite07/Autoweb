@@ -20,6 +20,19 @@ def create_course(db: Session, course):
         description=course.description,
         rating=course.rating,
         instructor=course.instructor,
+        # coupon removed per recent revert, but crud might still have it if schema has it. 
+        # Reverting to simple structure if needed, but schema shows coupon.
+        # Let's align with the fact we reverted coupon logic in parser/website but DB might still expect it or allow None.
+        # Safest is to keep it if field exists, but pass None if not provided.
+        # But wait, the user said "description is not available in web".
+        # This means `course.description` might be missing or not saving.
+        # Let's verify `website.py` sending it.
+        # website.py sends: "description": course.get("description"),
+        # schemas.py has: description: str | None = None
+        # models.py has: description = Column(String)
+        # So it SHOULD work.
+        # Let's just ensure this block is correct.
+        image=course.image,
         udemy_link=course.udemy_link,
     )
     db.add(db_course)

@@ -3,37 +3,38 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Simply Course - Top Udemy Courses{% endblock %}</title>
-    <meta name="description"
-        content="{% block description %}Discover the best Udemy courses with detailed insights and direct links.{% endblock %}">
-
-    <!-- Open Graph -->
-    <meta property="og:type" content="website">
-    <meta property="og:title" content="{% block og_title %}Simply Course{% endblock %}">
-    <meta property="og:description"
-        content="{% block og_description %}Get access to discounted and top-rated Udemy courses.{% endblock %}">
-    <meta property="theme-color" content="#0f172a">
-
+    <title>{{ title or "SU Course" }}</title>
     <link rel="stylesheet" href="/static/style.css">
 </head>
 
 <body>
-    <header>
-        <div class="container nav-content">
-            <a href="/" class="logo">Simply Course</a>
+
+    <header class="header">
+        <div class="container nav">
+            <a href="/" class="brand">SU Course</a>
+
+            <div class="nav-links">
+                <a href="/">Home</a>
+                <a href="/courses">Courses</a>
+            </div>
+
+            <form action="/search" method="get">
+                <input class="search-input" type="text" name="q" placeholder="Search courses…"
+                    value="{{ query or '' }}">
+            </form>
         </div>
     </header>
 
-    <main class="container">
+    <main>
         {% block content %}{% endblock %}
     </main>
 
-    <footer>
+    <footer class="footer">
         <div class="container">
-            <p>&copy; 2025 Simply Course. Not affiliated with Udemy.</p>
+            Curated course listings from public sources.
         </div>
     </footer>
+
 </body>
 
 </html>

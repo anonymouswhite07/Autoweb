@@ -11,5 +11,7 @@ class Course(Base):
     description = Column(String)
     rating = Column(String)
     instructor = Column(String)
+    coupon = Column(String, nullable=True)
+    image = Column(String, nullable=True)
     udemy_link = Column(String)
     created_at = Column(DateTime, default=datetime.utcnow)

@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
+        <h2 style="margin:0;">Manage Courses</h2>
+        <div>
+            <a href="/" class="view-link" style="margin-right:20px;">View Site</a>
+            <a href="/admin/new" class="enroll-btn" style="margin:0;padding:8px 16px;">+ Add Course</a>
+        </div>
+    </div>
+
+    {% for c in courses %}
+    <div class="course-card" style="align-items:center;">
+        <div style="flex:1;">
+            <div class="course-title">{{ c.title }}</div>
+            <div class="course-desc" style="margin-bottom:4px;">{{ c.description }}</div>
+            <div style="font-size:12px;color:#999;margin-bottom:8px;">Slug: {{ c.slug }}</div>
+        </div>
+        <div style="display:flex;gap:12px;font-size:14px;">
+            <a href="/admin/edit/{{ c.id }}" class="view-link">Edit</a>
+            <a href="/admin/delete/{{ c.id }}" class="view-link" style="color:#ef4444;"
+                onclick="return confirm('Use with caution: Delete this course?')">Delete</a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

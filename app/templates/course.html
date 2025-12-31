@@ -1,20 +1,22 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ course.title }}</title>
-    <link rel="stylesheet" href="/static/style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
-</head>
+{% block content %}
+<div class="container">
 
-<body>
-    <div class="container">
-        <h1>{{ course.title }}</h1>
-        <p>{{ course.description }}</p>
-        <a href="/go/{{ course.slug }}" class="btn primary">Get Course</a>
-    </div>
-</body>
+    {% if course.image %}
+    <img src="/static/images/{{ course.image }}" class="detail-img">
+    {% endif %}
 
-</html>
+    <h1>{{ course.title }}</h1>
+
+    {% if course.description %}
+    <div class="section-label">Description</div>
+    <p>{{ course.description }}</p>
+    {% endif %}
+
+    <a href="/go/{{ course.slug }}" class="enroll-btn">
+        Get course
+    </a>
+
+</div>
+{% endblock %}

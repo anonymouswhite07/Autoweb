@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container" style="max-width:600px;">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px;">
+        <a href="/admin" class="view-link">← Back</a>
+        <h2 style="margin:0;">{{ 'Edit' if course else 'Add' }} Course</h2>
+    </div>
+
+    <form method="post" style="display:flex;flex-direction:column;gap:20px;">
+        <div>
+            <label style="display:block;font-size:14px;font-weight:600;margin-bottom:6px;">Title</label>
+            <input class="search-input" style="width:100%;font-size:16px;padding:10px;" name="title"
+                placeholder="Course Title" value="{{ course.title if course }}" required>
+        </div>
+
+        <div>
+            <label style="display:block;font-size:14px;font-weight:600;margin-bottom:6px;">Description</label>
+            <textarea class="search-input" style="width:100%;font-size:16px;padding:10px;font-family:inherit;"
+                name="description" rows="5"
+                placeholder="Course Description">{{ course.description if course }}</textarea>
+        </div>
+
+        <div>
+            <label style="display:block;font-size:14px;font-weight:600;margin-bottom:6px;">Udemy Link</label>
+            <input class="search-input" style="width:100%;font-size:16px;padding:10px;" name="udemy_link"
+                placeholder="https://www.udemy.com/..." value="{{ course.udemy_link if course }}" required>
+        </div>
+
+        <button class="enroll-btn" style="align-self:flex-start;">Save Course</button>
+    </form>
+</div>
+{% endblock %}

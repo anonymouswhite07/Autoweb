@@ -5,6 +5,7 @@ class CourseCreate(BaseModel):
     description: str | None = None
     rating: str | None = None
     instructor: str | None = None
+    image: str | None = None
     udemy_link: str
 
 class CourseOut(BaseModel):
