@@ -7,10 +7,10 @@
     {% for course in courses %}
     <div class="course-card">
         {% if course.image %}
-        <img src="/static/images/{{ course.image }}" class="course-img">
+        <img src="{{ course.image }}" alt="{{ course.title }}" class="course-img">
         {% else %}
         <div class="course-img"
-            style="display:flex;align-items:center;justify-content:center;font-weight:bold;color:#ccc;">
+            style="display:flex;align-items:center;justify-content:center;font-weight:bold;color:#ccc;background:#2d2d2d;">
             {{ course.title[0] }}
         </div>
         {% endif %}
