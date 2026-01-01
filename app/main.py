@@ -33,8 +33,14 @@ def get_db():
 def add_course(course: CourseCreate, db: Session = Depends(get_db)):
     return create_course(db, course)
 
+@app.get("/health")
+@app.head("/health")
+def health():
+    return {"status": "healthy"}
+
 # Pages
 @app.get("/", response_class=HTMLResponse)
+@app.head("/", response_class=HTMLResponse)
 def home(request: Request, db: Session = Depends(get_db)):
     courses = get_courses(db)
     return templates.TemplateResponse("index.html", {
