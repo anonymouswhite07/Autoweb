@@ -6,7 +6,7 @@
         <h2 style="margin:0;">{{ 'Edit' if course else 'Add' }} Course</h2>
     </div>
 
-    <form method="post" style="display:flex;flex-direction:column;gap:20px;">
+    <form method="post" enctype="multipart/form-data" style="display:flex;flex-direction:column;gap:20px;">
         <div>
             <label style="display:block;font-size:14px;font-weight:600;margin-bottom:6px;">Title</label>
             <input class="search-input" style="width:100%;font-size:16px;padding:10px;" name="title"
@@ -26,7 +26,27 @@
                 placeholder="https://www.udemy.com/..." value="{{ course.udemy_link if course }}" required>
         </div>
 
-        <button class="enroll-btn" style="align-self:flex-start;">Save Course</button>
+        <!-- Image Management -->
+        <div style="border:1px solid #e5e7eb; padding:16px; border-radius:8px; background:#f9fafb;">
+            <label style="display:block;font-size:14px;font-weight:600;margin-bottom:12px;">Course Image</label>
+
+            {% if course and course.image %}
+            <div style="margin-bottom:12px;">
+                <img src="{{ course.image }}" style="height:100px;border-radius:6px;border:1px solid #ddd;">
+                <div style="margin-top:6px;">
+                    <label style="font-size:14px;color:#ef4444;cursor:pointer;">
+                        <input type="checkbox" name="delete_image" value="true"> Delete current image
+                    </label>
+                </div>
+            </div>
+            {% endif %}
+
+            <input type="file" name="image_file" accept="image/*" style="font-size:14px;">
+            <div style="font-size:12px;color:#666;margin-top:4px;">Upload new image (replaces current)</div>
+        </div>
+
+        <button class="enroll-btn" style="align-self:flex-start;">{{ 'Save Changes' if course else 'Create Course'
+            }}</button>
     </form>
 </div>
 {% endblock %}

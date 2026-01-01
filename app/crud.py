@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from .models import Course
+from .models import Course, BlogPost, Page
 import re
 
 def slugify(text: str):
@@ -45,3 +45,15 @@ def get_courses(db: Session):
 
 def get_course(db: Session, slug: str):
     return db.query(Course).filter(Course.slug == slug).first()
+
+def get_posts(db: Session):
+    return db.query(BlogPost).order_by(BlogPost.created_at.desc()).all()
+
+def get_post(db: Session, slug: str):
+    return db.query(BlogPost).filter(BlogPost.slug == slug).first()
+
+def get_pages(db: Session):
+    return db.query(Page).all()
+
+def get_page(db: Session, slug: str):
+    return db.query(Page).filter(Page.slug == slug).first()

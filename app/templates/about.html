@@ -1,20 +1,69 @@
 {% extends "base.html" %}
-
-{% block title %}About - Simply Course{% endblock %}
+{% block title %}About - SU Course{% endblock %}
 
 {% block content %}
-<div class="about-content">
-    <h1>About Simply Course</h1>
-    <p>
-        We curate the best deals on high-quality development, security, and IT courses.
-        Instead of flooding you with everything, we select courses that actually matter.
-    </p>
-    <p>
-        This platform curates publicly available course deals from multiple confirmed sources.
-        Our goal is to save you money while you learn valuable skills.
-    </p>
-    <div style="margin-top: 2rem;">
-        <a href="/" class="btn">Browse Courses</a>
-    </div>
+{% if page and page.content %}
+<div class="container" style="max-width: 800px; padding-top: 2rem;">
+    {{ page.content | safe }}
 </div>
+{% else %}
+<div class="container" style="max-width: 800px; padding-top: 2rem;">
+
+    <!-- Hero Text -->
+    <div style="text-align: center; margin-bottom: 4rem;">
+        <h1 style="font-size: 2.5rem; margin-bottom: 1rem; color: var(--text);">Empowering Learners Worldwide</h1>
+        <p style="font-size: 1.25rem; color: var(--muted); line-height: 1.6;">
+            We believe high-quality education should be accessible to everyone. <br>
+            SU Course bridges the gap between premium instructors and ambitious students.
+        </p>
+    </div>
+
+    <!-- Mission Grid -->
+    <div
+        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; margin-bottom: 4rem;">
+        <div
+            style="padding: 1.5rem; border: 1px solid var(--border); border-radius: var(--radius); background: #fafafa;">
+            <h3 style="margin-top: 0; color: var(--accent);">🎯 Curated Quality</h3>
+            <p style="color: var(--muted); font-size: 0.95rem;">
+                We don't just list every coupon. We filter for courses with high ratings, updated content, and real
+                value for modern tech careers.
+            </p>
+        </div>
+        <div
+            style="padding: 1.5rem; border: 1px solid var(--border); border-radius: var(--radius); background: #fafafa;">
+            <h3 style="margin-top: 0; color: var(--accent);">⚡ Direct Access</h3>
+            <p style="color: var(--muted); font-size: 0.95rem;">
+                No endless redirect loops. Our "Get Course" buttons take you directly to the learning platform with the
+                coupon code applied.
+            </p>
+        </div>
+    </div>
+
+    <!-- Our Story / Process -->
+    <div style="margin-bottom: 4rem;">
+        <h2 style="font-size: 1.8rem; margin-bottom: 1rem;">How It Works</h2>
+        <p style="color: var(--muted); margin-bottom: 1rem;">
+            Instructors often issue 100% OFF coupons to gain initial traction and reviews for their new courses.
+            However, these coupons are limited in quantity and expire quickly (often within 5 days).
+        </p>
+        <p style="color: var(--muted);">
+            Our automated systems monitor verified instructor channels 24/7. When a deal drops, we verify the link
+            and publish it instantly to our Telegram channel and this website. Speed is key.
+        </p>
+    </div>
+
+    <!-- CTA -->
+    <div
+        style="text-align: center; background: linear-gradient(135deg, #f3f4f6 0%, #fff 100%); padding: 3rem; border-radius: var(--radius); border: 1px solid var(--border);">
+        <h2 style="margin-top: 0;">Ready to start learning?</h2>
+        <p style="color: var(--muted); margin-bottom: 1.5rem;">Join thousands of students saving money daily.</p>
+        <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+            <a href="/courses" class="enroll-btn" style="padding: 12px 24px; font-size: 1rem;">Browse Courses</a>
+            <a href="https://t.me/+MyMptKPPZJ4yNTRl" target="_blank" class="enroll-btn"
+                style="background: #229ED9; padding: 12px 24px; font-size: 1rem;">Join Telegram</a>
+        </div>
+    </div>
+
+</div>
+{% endif %}
 {% endblock %}

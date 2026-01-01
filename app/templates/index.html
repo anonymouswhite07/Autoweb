@@ -1,37 +1,91 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="hero"
-    style="text-align:center; padding: 4rem 1rem; background: radial-gradient(circle at center, #2d2d2d 0%, #1a1a1a 100%); margin-bottom: 3rem; border-radius: 12px;">
+    style="text-align:center; padding: 5rem 1rem; background: radial-gradient(circle at center, #2d2d2d 0%, #1a1a1a 100%); margin-bottom: 3rem; border-radius: 12px; color: white;">
     <h1
-        style="font-size: 2.5rem; margin-bottom: 1rem; background: linear-gradient(90deg, #fff, #bbb); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
-        Master Tech Skills for Less
+        style="font-size: 3rem; margin-bottom: 1rem; font-weight: 800; letter-spacing: -1px; background: linear-gradient(90deg, #fff, #94a3b8); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">
+        Upgrade Your Skills. <br> Not Your Expenses.
     </h1>
-    <p style="font-size: 1.2rem; color: #aaa; max-width: 600px; margin: 0 auto 2rem auto;">
-        Curated deals on proper Udemy courses. No spam, just valid coupons for developers, designers, and IT pros.
+    <p style="font-size: 1.25rem; color: #d1d5db; max-width: 600px; margin: 0 auto 2.5rem auto; line-height: 1.6;">
+        Daily 100% OFF coupons for top-rated courses in Python, Web Dev, Cyber Security, and more.
     </p>
-    <a href="/courses" class="btn" style="padding: 0.8rem 2rem; font-size: 1.1rem;">Browse Latest Deals</a>
+    <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+        <a href="/courses" class="enroll-btn" style="padding: 12px 28px; font-size: 1.1rem; background: #2563eb;">Browse
+            Deals</a>
+        <a href="/about" class="enroll-btn"
+            style="padding: 12px 28px; font-size: 1.1rem; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);">How
+            it Works</a>
+    </div>
+</div>
+
+<div
+    style="text-align: center; margin-bottom: 3rem; display: flex; justify-content: center; gap: 2rem; flex-wrap: wrap; color: #6b7280; font-size: 0.9rem; font-weight: 500;">
+    <span>✓ Direct Udemy Links</span>
+    <span>✓ No Sign-up Required</span>
+    <span>✓ Verified Coupons</span>
 </div>
 
 <div class="container">
-    <h2 style="margin-bottom: 1.5rem;">Latest Courses</h2>
-    {% for course in courses %}
-    {% if course.slug %}
-    <div class="course-card">
-        {% if course.image %}
-        <img src="{{ course.image }}" alt="{{ course.title }}" class="course-img">
-        {% else %}
-        <div class="course-img"
-            style="display:flex;align-items:center;justify-content:center;font-weight:bold;color:#ccc;background:#2d2d2d;">
-            {{ course.title[0] }}
+    {% if popular_courses %}
+    <h2 style="margin-bottom: 1.5rem; text-align: center;">Most Popular Courses</h2>
+    <div class="simple-course-grid">
+        {% for course in popular_courses %}
+        <div class="course-card">
+            <a href="/course/{{ course.slug }}" style="text-decoration: none; color: inherit;">
+                <div class="course-img-wrapper">
+                    <div class="hover-overlay">
+                        <span class="get-course-btn">Get Course Now</span>
+                    </div>
+                    {% if course.image %}
+                    <img src="{{ course.image }}" alt="{{ course.title }}" class="course-img"
+                        style="width:100%;height:180px;object-fit:cover;">
+                    {% else %}
+                    <div class="course-img"
+                        style="display:flex;align-items:center;justify-content:center;font-weight:bold;color:#ccc;background:#2d2d2d;width:100%;height:180px;">
+                        {{ course.title[0] }}
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="course-content-wrapper">
+                    <div class="course-title">{{ course.title }}</div>
+                    <div class="course-desc">{{ course.description or "" }}</div>
+                    <span class="view-link" style="margin-top:auto;">View course →</span>
+                </div>
+            </a>
         </div>
-        {% endif %}
-        <div>
-            <div class="course-title">{{ course.title }}</div>
-            <div class="course-desc">{{ course.description or "" }}</div>
-            <a class="view-link" href="/course/{{ course.slug }}">View course →</a>
-        </div>
+        {% endfor %}
     </div>
     {% endif %}
-    {% endfor %}
+
+    <h2 style="margin-bottom: 1.5rem; text-align: center;">Latest Courses</h2>
+    <div class="simple-course-grid">
+        {% for course in courses %}
+        {% if course.slug %}
+        <div class="course-card">
+            <a href="/course/{{ course.slug }}" style="text-decoration: none; color: inherit;">
+                <div class="course-img-wrapper">
+                    <div class="hover-overlay">
+                        <span class="get-course-btn">Get Course Now</span>
+                    </div>
+                    {% if course.image %}
+                    <img src="{{ course.image }}" alt="{{ course.title }}" class="course-img"
+                        style="width:100%;height:180px;object-fit:cover;">
+                    {% else %}
+                    <div class="course-img"
+                        style="display:flex;align-items:center;justify-content:center;font-weight:bold;color:#ccc;background:#2d2d2d;width:100%;height:180px;">
+                        {{ course.title[0] }}
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="course-content-wrapper">
+                    <div class="course-title">{{ course.title }}</div>
+                    <div class="course-desc">{{ course.description or "" }}</div>
+                    <span class="view-link" style="margin-top:auto;">View course →</span>
+                </div>
+            </a>
+        </div>
+        {% endif %}
+        {% endfor %}
+    </div>
 </div>
 {% endblock %}

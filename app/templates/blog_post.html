@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}{{ post.title }} - SU Course{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 800px; padding-top: 2rem;">
+
+    <div style="margin-bottom: 24px;">
+        <a href="/blog" style="color:var(--muted);text-decoration:none;">&larr; Back to Blog</a>
+    </div>
+
+    {% if post.image %}
+    <img src="{{ post.image }}" alt="{{ post.title }}"
+        style="width:100%;border-radius:12px;margin-bottom:24px;border:1px solid var(--border);">
+    {% endif %}
+
+    <h1 style="font-size: 2.5rem; margin-bottom: 1rem; color: var(--text);">{{ post.title }}</h1>
+
+    <div
+        style="font-size: 0.9rem; color: var(--muted); margin-bottom: 2rem; border-bottom: 1px solid var(--border); padding-bottom: 1rem;">
+        Published on {{ post.created_at.strftime('%B %d, %Y') }}
+    </div>
+
+    <div class="blog-content" style="line-height: 1.8; color: var(--text); font-size: 1.1rem;">
+        {{ post.content | safe }}
+    </div>
+
+</div>
+{% endblock %}

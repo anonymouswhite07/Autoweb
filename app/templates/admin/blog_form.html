@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container" style="max-width: 800px;">
+    <h1>{{ 'Edit Post' if post else 'New Blog Post' }}</h1>
+
+    <form method="post" enctype="multipart/form-data" style="display:flex;flex-direction:column;gap:20px;">
+
+        <!-- Title -->
+        <div>
+            <label style="display:block;font-weight:600;margin-bottom:8px;">Title</label>
+            <input type="text" name="title" value="{{ post.title if post else '' }}" required
+                style="width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;box-sizing:border-box;">
+        </div>
+
+        <!-- Excerpt -->
+        <div>
+            <label style="display:block;font-weight:600;margin-bottom:8px;">Excerpt (Optional)</label>
+            <textarea name="excerpt" rows="2"
+                style="width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;box-sizing:border-box;">{{ post.excerpt if post else '' }}</textarea>
+        </div>
+
+        <!-- Content (HTML) -->
+        <div>
+            <label style="display:block;font-weight:600;margin-bottom:8px;">Content (HTML supported)</label>
+            <textarea name="content" rows="15" required
+                style="width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;box-sizing:border-box;font-family:monospace;">{{ post.content if post else '' }}</textarea>
+        </div>
+
+        <!-- Image -->
+        <div style="border:1px solid #e5e7eb; padding:16px; border-radius:8px; background:#f9fafb;">
+            <label style="display:block;font-weight:600;margin-bottom:12px;">Featured Image</label>
+
+            {% if post and post.image %}
+            <div style="margin-bottom:12px;">
+                <img src="{{ post.image }}" style="height:100px;border-radius:6px;border:1px solid #ddd;">
+                <div style="margin-top:6px;">
+                    <label style="font-size:14px;color:#ef4444;cursor:pointer;">
+                        <input type="checkbox" name="delete_image" value="true"> Delete current image
+                    </label>
+                </div>
+            </div>
+            {% endif %}
+
+            <input type="file" name="image_file" accept="image/*" style="font-size:14px;">
+        </div>
+
+        <button class="enroll-btn" style="align-self:flex-start;">Save Post</button>
+    </form>
+</div>
+{% endblock %}

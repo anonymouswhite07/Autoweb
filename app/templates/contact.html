@@ -3,28 +3,41 @@
 {% block title %}Contact Us - SU Course{% endblock %}
 
 {% block content %}
+{% if page and page.content %}
+<div class="container" style="max-width: 600px;">
+    {{ page.content | safe }}
+</div>
+{% else %}
 <div class="container" style="max-width: 600px;">
     <h1 style="margin-bottom: 1.5rem;">Contact Us</h1>
+
+    {% if success %}
+    <div
+        style="background:#d1fae5;color:#065f46;padding:12px;border-radius:6px;margin-bottom:20px;border:1px solid #a7f3d0;">
+        {{ success }}
+    </div>
+    {% endif %}
+
     <p style="color: #aaa; margin-bottom: 2rem;">
         Have a question, feedback, or found a broken link? Let us know below.
     </p>
 
-    <form style="display: flex; flex-direction: column; gap: 1.5rem;">
+    <form action="/contact" method="post" style="display: flex; flex-direction: column; gap: 1.5rem;">
         <div>
             <label style="display: block; margin-bottom: 0.5rem; color: #ccc;">Name</label>
-            <input type="text" placeholder="Your name"
+            <input type="text" name="name" placeholder="Your name" required
                 style="width: 100%; padding: 0.8rem; background: #2d2d2d; border: 1px solid #444; color: #fff; border-radius: 6px;">
         </div>
 
         <div>
             <label style="display: block; margin-bottom: 0.5rem; color: #ccc;">Email</label>
-            <input type="email" placeholder="you@example.com"
+            <input type="email" name="email" placeholder="you@example.com" required
                 style="width: 100%; padding: 0.8rem; background: #2d2d2d; border: 1px solid #444; color: #fff; border-radius: 6px;">
         </div>
 
         <div>
             <label style="display: block; margin-bottom: 0.5rem; color: #ccc;">Message</label>
-            <textarea rows="5" placeholder="How can we help?"
+            <textarea name="message" rows="5" placeholder="How can we help?" required
                 style="width: 100%; padding: 0.8rem; background: #2d2d2d; border: 1px solid #444; color: #fff; border-radius: 6px;"></textarea>
         </div>
 
@@ -34,12 +47,13 @@
     <div style="margin-top: 3rem; border-top: 1px solid #333; padding-top: 2rem;">
         <h3 style="margin-bottom: 1rem;">Other ways to reach us</h3>
         <p style="color: #aaa;">
-            📧 Email: <a href="mailto:support@sucourse.com"
-                style="color: var(--primary-color);">support@sucourse.com</a>
+            📧 Email: <a href="mailto:sucourse@zohomail.in"
+                style="color: var(--primary-color);">sucourse@zohomail.in</a>
         </p>
         <p style="color: #aaa;">
-            📱 Telegram: <a href="https://t.me/sucourse" style="color: var(--primary-color);">@sucourse</a>
+            📱 Telegram: <a href="https://t.me/+MyMptKPPZJ4yNTRl" style="color: var(--primary-color);">Join Channel</a>
         </p>
     </div>
 </div>
+{% endif %}
 {% endblock %}

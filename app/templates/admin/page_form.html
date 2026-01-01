@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container" style="max-width: 800px;">
+    <h1>Edit Page: {{ page.title }}</h1>
+
+    <form method="post" style="display:flex;flex-direction:column;gap:20px;">
+
+        <!-- Title -->
+        <div>
+            <label style="display:block;font-weight:600;margin-bottom:8px;">Page Title</label>
+            <input type="text" name="title" value="{{ page.title }}" required
+                style="width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;box-sizing:border-box;">
+        </div>
+
+        <!-- Content (HTML) -->
+        <div>
+            <label style="display:block;font-weight:600;margin-bottom:8px;">Page Content (HTML supported)</label>
+            <p style="font-size:12px;color:#666;margin-bottom:8px;">
+                Note: This content will replace the dynamic body of the page.
+            </p>
+            <textarea name="content" rows="20" required
+                style="width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;box-sizing:border-box;font-family:monospace;">{{ page.content or '' }}</textarea>
+        </div>
+
+        <button class="enroll-btn" style="align-self:flex-start;">Update Page</button>
+    </form>
+</div>
+{% endblock %}
