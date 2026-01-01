@@ -3,7 +3,20 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ title or "SU Course" }}</title>
+
+    <meta name="description" content="{{ description or 'Curated tech courses with coupons' }}">
+
+    <!-- Open Graph / SEO -->
+    <meta property="og:title" content="{{ og_title or title or 'SU Course' }}">
+    <meta property="og:description" content="{{ og_description or description or 'Curated tech courses' }}">
+    <meta property="og:type" content="website">
+
+    {% if course and course.image %}
+    <meta property="og:image" content="{{ course.image }}">
+    {% endif %}
+
     <link rel="stylesheet" href="/static/style.css">
 </head>
 

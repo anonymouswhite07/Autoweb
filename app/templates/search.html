@@ -5,6 +5,7 @@
 
     {% if courses %}
     {% for course in courses %}
+    {% if course.slug %}
     <div class="course-card">
         {% if course.image %}
         <img src="{{ course.image }}" alt="{{ course.title }}" class="course-img">
@@ -20,6 +21,7 @@
             <a class="view-link" href="/course/{{ course.slug }}">View course →</a>
         </div>
     </div>
+    {% endif %}
     {% endfor %}
     {% else %}
     <p>No courses found.</p>
