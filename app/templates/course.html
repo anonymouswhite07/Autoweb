@@ -12,7 +12,7 @@
     <p>{{ course.description }}</p>
     {% endif %}
 
-    <a href="/go/{{ course.slug }}" target="_blank" class="enroll-btn">
+    <a href="{{ course.udemy_link }}" target="_blank" rel="noopener noreferrer" class="enroll-btn">
         Get course
     </a>
 

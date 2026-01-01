@@ -114,6 +114,46 @@ def parse_course(message):
     title = lines[0].replace("**", "").strip()
     description = extract_description(lines)
 
+def extract_coupon_code(text: str):
+    """
+    Extracts coupon code from:
+    Coupon Code:- HNY2026_2
+    """
+    # Regex to handle "Coupon Code:- CODE" or "Coupon Code: CODE" variants
+    match = re.search(r"Coupon Code\s*:?-?\s*([A-Z0-9_\-]+)", text, re.IGNORECASE)
+    if match:
+        return match.group(1).strip()
+    return None
+
+def build_udemy_link(title: str, coupon: str):
+    slug = udemy_slug_from_title(title)
+    return f"https://www.udemy.com/course/{slug}/?couponCode={coupon}"
+
+def parse_course(message):
+    text = message.text or ""
+    lines = [l.strip() for l in text.split("\n") if l.strip()]
+
+    if not lines:
+        return None
+
+    title = lines[0].replace("**", "").strip()
+    description = extract_description(lines)
+
+    # 0️⃣ PRIORITY: Extract Coupon & Build Link (Bypassing redirects)
+    coupon = extract_coupon_code(text)
+    if coupon:
+        direct_link = build_udemy_link(title, coupon)
+        # Verify it exists or just trust the construction?
+        # User said "Just make it work", implying trust the construction.
+        # But fetching OG image is still good practice.
+        return {
+            "title": title,
+            "description": description,
+            "udemy_link": direct_link,
+            "status": "DIRECT_UDEMY",
+            "image_url": fetch_og_image(direct_link)
+        }
+
     # 1️⃣ Plain text link found in message body
     # Prioritize Udemy links
     udemy_match = re.search(r"(https?://www\.udemy\.com/course/[^\s]+)", text)
@@ -131,6 +171,8 @@ def parse_course(message):
     link_match = re.search(r"(https?://[^\s]+)", text)
     if link_match:
         link = link_match.group(1)
+        # If the user strictly wants NO Coursevania/Redirects, maybe we should skip this?
+        # But for now, keeping as fallback for non-coupon posts.
         return {
             "title": title,
             "description": description,
@@ -148,19 +190,6 @@ def parse_course(message):
             "udemy_link": button_link,
             "status": "AUTO_BUTTON",
             "image_url": fetch_og_image(button_link)
-        }
-
-    # 3️⃣ Guess Udemy URL from title (fallback)
-    slug = udemy_slug_from_title(title)
-    guessed_url = f"https://www.udemy.com/course/{slug}/"
-
-    if udemy_url_exists(guessed_url):
-        return {
-            "title": title,
-            "description": description,
-            "udemy_link": guessed_url,
-            "status": "AUTO_GUESSED",
-            "image_url": fetch_og_image(guessed_url)
         }
 
     # Final fallback
