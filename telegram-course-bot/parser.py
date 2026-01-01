@@ -57,6 +57,26 @@ def extract_description(lines):
         if line.startswith("http") or "udemy.com" in line:
             break
 
+        # BLACKLIST CLEANING
+        blacklist = [
+            "Description:", 
+            "👉 Get Course:", 
+            "Coupon Code:-",
+            "Rating:",
+            "Students:",
+            "Duration:"
+        ]
+        
+        should_skip = False
+        for bad_word in blacklist:
+            if bad_word in line:
+                line = line.replace(bad_word, "")
+                # If line becomes empty or just symbols, skip it
+                if not line.strip() or line.strip() in [":", "-"]:
+                    should_skip = True
+        
+        if should_skip: continue
+        
         # skip promo lines
         if is_promo_line(line):
             continue
