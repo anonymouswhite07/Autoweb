@@ -71,7 +71,13 @@ async def handler(event):
         print("❌ ERROR in handler:", e)
 
 async def main():
-    await client.start()
+    if BOT_TOKEN:
+        print("🤖 Authenticating with BOT_TOKEN...")
+        await client.start(bot_token=BOT_TOKEN)
+    else:
+        print("👤 Authenticating with User Session...")
+        await client.start()
+    
     print(f"🤖 Connected to Telegram! Listening on {SOURCE_CHANNELS}...")
     print("------------------------------------------------")
     await client.run_until_disconnected()

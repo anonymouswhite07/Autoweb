@@ -9,6 +9,7 @@ load_dotenv(dotenv_path=ENV_PATH)
 
 api_id = int(os.getenv("API_ID"))
 api_hash = os.getenv("API_HASH")
+BOT_TOKEN = os.getenv("BOT_TOKEN")
 
 # Handle Multiple Source Channels
 SOURCE_CHANNELS = []
