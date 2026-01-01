@@ -5,7 +5,7 @@ from poster import post_to_channel
 from website import save_course
 from utils import slugify
 
-client = TelegramClient("session/session", api_id, api_hash)
+client = TelegramClient("bot_session", api_id, api_hash)
 
 @client.on(events.NewMessage(chats=SOURCE_CHANNEL))
 async def handler(event):
