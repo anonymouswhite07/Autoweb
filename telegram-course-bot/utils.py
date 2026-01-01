@@ -1,5 +1,5 @@
 import re
-from googlesearch import search
+# from googlesearch import search (REMOVED: Unstable on Render)
 import time
 
 def slugify(text):
@@ -7,15 +7,15 @@ def slugify(text):
     text = re.sub(r'[^a-z0-9\s-]', '', text)
     return re.sub(r'\s+', '-', text).strip('-')
 
-def search_udemy_url(title):
-    query = f"site:udemy.com {title}"
-    try:
-        # Search and return the first result that is a valid course link
-        for result in search(query, num_results=5, lang="en"):
-            if "udemy.com/course/" in result:
-                return result
-    except Exception as e:
-        print(f"⚠️ Search error: {e}")
+# DEPRECATED: Google Search causes IP bans on cloud hosting.
+# def search_udemy_url(title):
+#     query = f"site:udemy.com {title}"
+#     try:
+#         for result in search(query, num_results=5, lang="en"):
+#             if "udemy.com/course/" in result:
+#                 return result
+#     except Exception as e:
+#         print(f"⚠️ Search error: {e}")
 def udemy_slug_from_title(title: str) -> str:
     text = title.lower()
     text = text.replace("&", "and")
