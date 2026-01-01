@@ -72,6 +72,9 @@ async def main():
     print("------------------------------------------------")
     await client.run_until_disconnected()
 
-if __name__ == '__main__':
+def start_bot():
     import asyncio
     asyncio.run(main())
+
+if __name__ == '__main__':
+    start_bot()
