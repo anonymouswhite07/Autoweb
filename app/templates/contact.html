@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Contact Us - SU Course{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 600px;">
+    <h1 style="margin-bottom: 1.5rem;">Contact Us</h1>
+    <p style="color: #aaa; margin-bottom: 2rem;">
+        Have a question, feedback, or found a broken link? Let us know below.
+    </p>
+
+    <form style="display: flex; flex-direction: column; gap: 1.5rem;">
+        <div>
+            <label style="display: block; margin-bottom: 0.5rem; color: #ccc;">Name</label>
+            <input type="text" placeholder="Your name"
+                style="width: 100%; padding: 0.8rem; background: #2d2d2d; border: 1px solid #444; color: #fff; border-radius: 6px;">
+        </div>
+
+        <div>
+            <label style="display: block; margin-bottom: 0.5rem; color: #ccc;">Email</label>
+            <input type="email" placeholder="you@example.com"
+                style="width: 100%; padding: 0.8rem; background: #2d2d2d; border: 1px solid #444; color: #fff; border-radius: 6px;">
+        </div>
+
+        <div>
+            <label style="display: block; margin-bottom: 0.5rem; color: #ccc;">Message</label>
+            <textarea rows="5" placeholder="How can we help?"
+                style="width: 100%; padding: 0.8rem; background: #2d2d2d; border: 1px solid #444; color: #fff; border-radius: 6px;"></textarea>
+        </div>
+
+        <button type="submit" class="btn" style="align-self: flex-start; padding: 0.8rem 2rem;">Send Message</button>
+    </form>
+
+    <div style="margin-top: 3rem; border-top: 1px solid #333; padding-top: 2rem;">
+        <h3 style="margin-bottom: 1rem;">Other ways to reach us</h3>
+        <p style="color: #aaa;">
+            📧 Email: <a href="mailto:support@sucourse.com"
+                style="color: var(--primary-color);">support@sucourse.com</a>
+        </p>
+        <p style="color: #aaa;">
+            📱 Telegram: <a href="https://t.me/sucourse" style="color: var(--primary-color);">@sucourse</a>
+        </p>
+    </div>
+</div>
+{% endblock %}

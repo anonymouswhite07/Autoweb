@@ -3,7 +3,9 @@
 {% block content %}
 <div class="container">
 
+    {% if course.image %}
     <img src="{{ course.image }}" alt="{{ course.title }}" style="width:100%;border-radius:12px;margin-bottom:20px;">
+    {% endif %}
 
     <h1>{{ course.title }}</h1>
 

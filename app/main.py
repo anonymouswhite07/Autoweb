@@ -75,9 +75,9 @@ def redirect_to_udemy(slug: str, db: Session = Depends(get_db)):
 
 @app.get("/courses", response_class=HTMLResponse)
 def all_courses(request: Request, db: Session = Depends(get_db)):
-    # reusing index template for now which lists all courses
+    # All courses for the catalog page
     courses = get_courses(db)
-    return templates.TemplateResponse("index.html", {
+    return templates.TemplateResponse("courses.html", {
         "request": request,
         "courses": courses,
         "title": "All Courses - SU Course"
@@ -97,6 +97,23 @@ def search(request: Request, q: str = "", db: Session = Depends(get_db)):
         "search.html",
         {"request": request, "courses": courses, "query": q, "title": f"Search: {q}"}
     )
+
+@app.get("/about", response_class=HTMLResponse)
+def about(request: Request):
+    return templates.TemplateResponse("about.html", {"request": request, "title": "About - SU Course"})
+
+@app.get("/blog", response_class=HTMLResponse)
+def blog(request: Request):
+    # Static blog for now
+    posts = [
+        {"title": "How to learn Python in 2026", "date": "Jan 01, 2026", "excerpt": "The landscape of Python learning has changed with AI..."},
+        {"title": "Best Certifications for DevOps", "date": "Dec 28, 2025", "excerpt": "AWS, Azure, or GCP? Here is our breakdown..."}
+    ]
+    return templates.TemplateResponse("blog.html", {"request": request, "posts": posts, "title": "Blog - SU Course"})
+
+@app.get("/contact", response_class=HTMLResponse)
+def contact(request: Request):
+    return templates.TemplateResponse("contact.html", {"request": request, "title": "Contact Us - SU Course"})
 
 # --- ADMIN PANEL ---
 from fastapi import Form

@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}All Courses - SU Course{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <h1>All Courses</h1>
+        <!-- Search is already in header, but could add filter buttons here later -->
+    </div>
+
+    {% if courses %}
+    <div class="course-list">
+        {% for course in courses %}
+        {% if course.slug %}
+        <div class="course-card">
+            {% if course.image %}
+            <img src="{{ course.image }}" alt="{{ course.title }}" class="course-img">
+            {% else %}
+            <div class="course-img"
+                style="display:flex;align-items:center;justify-content:center;font-weight:bold;color:#ccc;background:#2d2d2d;">
+                {{ course.title[0] }}
+            </div>
+            {% endif %}
+            <div>
+                <div class="course-title">{{ course.title }}</div>
+                <div class="course-desc">{{ course.description or "" }}</div>
+                <a class="view-link" href="/course/{{ course.slug }}">View course →</a>
+            </div>
+        </div>
+        {% endif %}
+        {% endfor %}
+    </div>
+    {% else %}
+    <p>No courses found.</p>
+    {% endif %}
+</div>
+{% endblock %}

@@ -47,14 +47,6 @@ def extract_button_link(message):
         
     return None
 
-def parse_course(message):
-    text = message.text or ""
-    lines = [l.strip() for l in text.split("\n") if l.strip()]
-
-    if not lines:
-        return None
-
-    # Remove markdown bolding from title
 def is_promo_line(line: str) -> bool:
     promo_keywords = [
         "free for",
@@ -103,16 +95,6 @@ def extract_description(lines):
 
     description = " ".join(desc_lines).strip()
     return description
-
-def parse_course(message):
-    text = message.text or ""
-    lines = [l.strip() for l in text.split("\n") if l.strip()]
-
-    if not lines:
-        return None
-
-    title = lines[0].replace("**", "").strip()
-    description = extract_description(lines)
 
 def extract_coupon_code(text: str):
     """

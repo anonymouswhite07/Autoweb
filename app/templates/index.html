@@ -1,6 +1,19 @@
 {% extends "base.html" %}
 {% block content %}
+<div class="hero"
+    style="text-align:center; padding: 4rem 1rem; background: radial-gradient(circle at center, #2d2d2d 0%, #1a1a1a 100%); margin-bottom: 3rem; border-radius: 12px;">
+    <h1
+        style="font-size: 2.5rem; margin-bottom: 1rem; background: linear-gradient(90deg, #fff, #bbb); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+        Master Tech Skills for Less
+    </h1>
+    <p style="font-size: 1.2rem; color: #aaa; max-width: 600px; margin: 0 auto 2rem auto;">
+        Curated deals on proper Udemy courses. No spam, just valid coupons for developers, designers, and IT pros.
+    </p>
+    <a href="/courses" class="btn" style="padding: 0.8rem 2rem; font-size: 1.1rem;">Browse Latest Deals</a>
+</div>
+
 <div class="container">
+    <h2 style="margin-bottom: 1.5rem;">Latest Courses</h2>
     {% for course in courses %}
     {% if course.slug %}
     <div class="course-card">

@@ -5,18 +5,19 @@ from poster import post_to_channel
 from website import save_course
 from utils import slugify
 
+
 client = TelegramClient("user_session_clean", api_id, api_hash)
 
 @client.on(events.NewMessage(chats=SOURCE_CHANNELS))
 async def handler(event):
     try:
         text = event.message.text
-        print(f"\n📩 New message received from {event.chat_id}")
+        # print(f"\n📩 New message received from {event.chat_id}")
 
         course = parse_course(event.message)
         
         if not course:
-            print("⚠️ Message ignored (parser returned None)")
+            # print("⚠️ Message ignored (parser returned None)")
             return
 
         print(f"📝 Parsed course: {course['title']} | Status: {course.get('status')}")
@@ -28,19 +29,28 @@ async def handler(event):
         # ✅ CREATE SLUG FIRST (CRITICAL)
         course["slug"] = slugify(course["title"])
 
-        # 🖼️ HANDLE IMAGE (Stateless)
-        # 1. Try OG Image (Best Quality)
-        course["image"] = course.get("image_url")
-        
-        # 2. Fallback to Telegram Message Link (if OG failed)
-        if not course["image"] and event.message.media:
-            # Construct public link if possible
-            chat = await event.get_chat()
-            if hasattr(chat, 'username') and chat.username:
-                course["image"] = f"https://t.me/{chat.username}/{event.id}"
-            # Note: Private channel links (t.me/c/...) won't preview as images in <img> tags universally, 
-            # but we can store it as a reference.
+        # 🖼️ HANDLE IMAGE (Local Storage)
+        # Check if message has a photo to upload
+        if event.message.photo:
+            print("🖼️ Downloading image from Telegram...")
+            # Define path
+            file_name = f"{course['slug']}.jpg"
+            save_path = os.path.join("..", "app", "static", "images", file_name)
             
+            # Ensure directory exists
+            os.makedirs(os.path.dirname(save_path), exist_ok=True)
+            
+            # Download
+            await client.download_media(event.message.photo, file=save_path)
+            
+            # Save relative path to DB (compatible with our templates)
+            course["image"] = f"/static/images/{file_name}"
+            print(f"✅ Saved local image: {course['image']}")
+            
+        else:
+             # Fallback to OG if no photo
+             course["image"] = course.get("image_url")
+
         print("SENDING TO WEBSITE:", course)
 
         save_course(course, WEBSITE_API)
