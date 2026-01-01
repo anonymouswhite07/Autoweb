@@ -37,18 +37,23 @@ async def handler(event):
                 filename = f"{course['slug']}.jpg"
                 path = await client.download_media(event.message, file=filename)
                 
-                # Move to website static folder (Assuming local relative path for Phase 2 local test)
+                # Save to absolute path inside app/static/images
                 import shutil
                 import os
                 
-                website_images_dir = "../app/static/images"
+                # Resolving absolute path to app/static/images relative to this script
+                base_dir = os.path.dirname(os.path.abspath(__file__))
+                website_images_dir = os.path.join(base_dir, "..", "app", "static", "images")
                 os.makedirs(website_images_dir, exist_ok=True)
                 
                 dest_path = os.path.join(website_images_dir, filename)
                 shutil.move(path, dest_path)
                 
                 print(f"✅ Image moved to {dest_path}")
-                course["image"] = filename
+                # Store relative URL for website to use
+                course["image"] = filename # database currently just stores filename, let's keep it consistent or change to full path?
+                # The template uses <img src="/static/images/{{ course.image }}"> so filename is correct.
+
                 
             except Exception as e:
                 print(f"⚠️ Image processing failed: {e}")
