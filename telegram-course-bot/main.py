@@ -50,9 +50,8 @@ async def handler(event):
                 shutil.move(path, dest_path)
                 
                 print(f"✅ Image moved to {dest_path}")
-                # Store relative URL for website to use
-                course["image"] = filename # database currently just stores filename, let's keep it consistent or change to full path?
-                # The template uses <img src="/static/images/{{ course.image }}"> so filename is correct.
+                # Store full relative URL for website to use as per professional standard
+                course["image"] = f"/static/images/{filename}"
 
                 
             except Exception as e:

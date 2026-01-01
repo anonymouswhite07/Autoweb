@@ -4,7 +4,7 @@
 <div class="container">
 
     {% if course.image %}
-    <img src="/static/images/{{ course.image }}" class="detail-img">
+    <img src="{{ course.image }}" class="detail-img">
     {% endif %}
 
     <h1>{{ course.title }}</h1>
