@@ -29,9 +29,19 @@ async def handler(event):
         course["slug"] = slugify(course["title"])
 
         # 🖼️ HANDLE IMAGE (Stateless)
-        # We now get the image_url directly from the parser (via OpenGraph)
-        # so we don't need to manually process media here for the website.
+        # 1. Try OG Image (Best Quality)
         course["image"] = course.get("image_url")
+        
+        # 2. Fallback to Telegram Message Link (if OG failed)
+        if not course["image"] and event.message.media:
+            # Construct public link if possible
+            chat = await event.get_chat()
+            if hasattr(chat, 'username') and chat.username:
+                course["image"] = f"https://t.me/{chat.username}/{event.id}"
+            # Note: Private channel links (t.me/c/...) won't preview as images in <img> tags universally, 
+            # but we can store it as a reference.
+            
+        print("SENDING TO WEBSITE:", course)
 
         save_course(course, WEBSITE_API)
         
