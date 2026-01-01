@@ -1,3 +1,4 @@
+import re
 from googlesearch import search
 import time
 
