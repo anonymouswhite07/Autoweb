@@ -6,8 +6,14 @@ from main import start_bot  # Exposing the bot starter
 app = FastAPI()
 
 @app.get("/")
-def health():
+@app.head("/")
+def root():
     return {"status": "bot running"}
+
+@app.get("/health")
+@app.head("/health")
+def health():
+    return {"status": "bot healthy"}
 
 def bot_runner():
     while True:
