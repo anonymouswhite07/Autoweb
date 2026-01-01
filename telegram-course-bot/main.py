@@ -7,11 +7,11 @@ from utils import slugify
 
 client = TelegramClient("bot_session", api_id, api_hash)
 
-@client.on(events.NewMessage(chats=SOURCE_CHANNEL))
+@client.on(events.NewMessage(chats=SOURCE_CHANNELS))
 async def handler(event):
     try:
         text = event.message.text
-        print("\n📩 New message received")
+        print(f"\n📩 New message received from {event.chat_id}")
 
         course = parse_course(event.message)
         
@@ -68,7 +68,7 @@ async def handler(event):
 
 async def main():
     await client.start()
-    print(f"🤖 Connected to Telegram! Listening on {SOURCE_CHANNEL}...")
+    print(f"🤖 Connected to Telegram! Listening on {SOURCE_CHANNELS}...")
     print("------------------------------------------------")
     await client.run_until_disconnected()
 
