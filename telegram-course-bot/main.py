@@ -5,7 +5,7 @@ from poster import post_to_channel
 from website import save_course
 from utils import slugify
 
-client = TelegramClient("bot_session", api_id, api_hash)
+client = TelegramClient("user_session_clean", api_id, api_hash)
 
 @client.on(events.NewMessage(chats=SOURCE_CHANNELS))
 async def handler(event):
@@ -28,55 +28,29 @@ async def handler(event):
         # ✅ CREATE SLUG FIRST (CRITICAL)
         course["slug"] = slugify(course["title"])
 
-        # 🖼️ HANDLE IMAGE
+        # 🖼️ HANDLE IMAGE (Stateless)
+        image_public_url = None
         if event.message.media:
-            print("🖼️ Found media, downloading...")
-            path = None
-            try:
-                # Use slug as filename
-                filename = f"{course['slug']}.jpg"
-                path = await client.download_media(event.message, file=filename)
-                
-                # Save to absolute path inside app/static/images
-                import shutil
-                import os
-                
-                # Resolving absolute path to app/static/images relative to this script
-                base_dir = os.path.dirname(os.path.abspath(__file__))
-                website_images_dir = os.path.join(base_dir, "..", "app", "static", "images")
-                os.makedirs(website_images_dir, exist_ok=True)
-                
-                dest_path = os.path.join(website_images_dir, filename)
-                shutil.move(path, dest_path)
-                
-                print(f"✅ Image moved to {dest_path}")
-                # Store full relative URL for website to use as per professional standard
-                course["image"] = f"/static/images/{filename}"
-
-                
-            except Exception as e:
-                print(f"⚠️ Image processing failed: {e}")
-                # clean up if move failed but download succeeded
-                if path and os.path.exists(path):
-                    os.remove(path)
+            print("🖼️ Found media, will forward to channel...")
+            image_public_url = None 
         else:
-             course["image"] = None
+             image_public_url = None
+
+        course["image"] = image_public_url
 
         save_course(course, WEBSITE_API)
-        await post_to_channel(client, TARGET_CHANNEL, course, WEBSITE_BASE)
+        
+        # Pass the actual media object to the poster to send to Telegram
+        await post_to_channel(client, TARGET_CHANNEL, course, WEBSITE_BASE, media=event.message.media)
 
-        print("✅ Course posted successfully")
+        print("✅ Course posted successfully (Stateless)")
 
     except Exception as e:
         print("❌ ERROR in handler:", e)
 
 async def main():
-    if BOT_TOKEN:
-        print("🤖 Authenticating with BOT_TOKEN...")
-        await client.start(bot_token=BOT_TOKEN)
-    else:
-        print("👤 Authenticating with User Session...")
-        await client.start()
+    print("👤 Authenticating with User Session...")
+    await client.start()
     
     print(f"🤖 Connected to Telegram! Listening on {SOURCE_CHANNELS}...")
     print("------------------------------------------------")

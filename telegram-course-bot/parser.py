@@ -2,6 +2,24 @@ import re
 import requests
 from utils import udemy_slug_from_title, build_udemy_url
 
+def fetch_og_image(url: str) -> str:
+    try:
+        if not url: return None
+        # Fake header to avoid being blocked
+        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'}
+        r = requests.get(url, headers=headers, timeout=10)
+        if r.status_code == 200:
+            # Simple regex search for og:image to avoid bs4 dependency if desired, or use it if installed.
+            # Assuming bs4 is installed since googlesearch-python uses it.
+            from bs4 import BeautifulSoup
+            soup = BeautifulSoup(r.text, 'html.parser')
+            og_image = soup.find("meta", property="og:image")
+            if og_image and og_image.get("content"):
+                return og_image["content"]
+    except Exception as e:
+        print(f"⚠️ Failed to fetch OG image: {e}")
+    return None
+
 def udemy_url_exists(url: str) -> bool:
     try:
         r = requests.head(url, allow_redirects=True, timeout=8)
@@ -100,21 +118,25 @@ def parse_course(message):
     # Prioritize Udemy links
     udemy_match = re.search(r"(https?://www\.udemy\.com/course/[^\s]+)", text)
     if udemy_match:
+        link = udemy_match.group(1)
         return {
             "title": title,
             "description": description,
-            "udemy_link": udemy_match.group(1),
-            "status": "AUTO"
+            "udemy_link": link,
+            "status": "AUTO",
+            "image_url": fetch_og_image(link)
         }
     
     # Check for other links if no udemy link
     link_match = re.search(r"(https?://[^\s]+)", text)
     if link_match:
+        link = link_match.group(1)
         return {
             "title": title,
             "description": description,
-            "udemy_link": link_match.group(1),
-            "status": "AUTO_OTHER_LINK"
+            "udemy_link": link,
+            "status": "AUTO_OTHER_LINK",
+             "image_url": fetch_og_image(link)
         }
 
     # 2️⃣ Button link (Enroll Now)
@@ -124,7 +146,8 @@ def parse_course(message):
             "title": title,
             "description": description,
             "udemy_link": button_link,
-            "status": "AUTO_BUTTON"
+            "status": "AUTO_BUTTON",
+            "image_url": fetch_og_image(button_link)
         }
 
     # 3️⃣ Guess Udemy URL from title (fallback)
@@ -136,7 +159,8 @@ def parse_course(message):
             "title": title,
             "description": description,
             "udemy_link": guessed_url,
-            "status": "AUTO_GUESSED"
+            "status": "AUTO_GUESSED",
+            "image_url": fetch_og_image(guessed_url)
         }
 
     # Final fallback
@@ -144,5 +168,6 @@ def parse_course(message):
         "title": title,
         "description": description,
         "udemy_link": None,
-        "status": "NEEDS_LINK"
+        "status": "NEEDS_LINK",
+        "image_url": None
     }
