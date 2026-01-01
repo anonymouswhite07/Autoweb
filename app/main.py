@@ -61,8 +61,16 @@ def course_page(slug: str, request: Request, db: Session = Depends(get_db)):
 @app.get("/go/{slug}")
 def redirect_to_udemy(slug: str, db: Session = Depends(get_db)):
     course = get_course(db, slug)
+    print("DEBUG COURSE:", course)
+    
     if not course:
-        raise HTTPException(status_code=404)
+        return {"detail": "Course not found"}
+        
+    print("DEBUG SOURCE LINK:", course.udemy_link)
+
+    if not course.udemy_link:
+        return {"detail": "Course link not found"}
+
     return RedirectResponse(course.udemy_link)
 
 @app.get("/courses", response_class=HTMLResponse)
