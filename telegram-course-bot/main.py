@@ -29,14 +29,9 @@ async def handler(event):
         course["slug"] = slugify(course["title"])
 
         # 🖼️ HANDLE IMAGE (Stateless)
-        image_public_url = None
-        if event.message.media:
-            print("🖼️ Found media, will forward to channel...")
-            image_public_url = None 
-        else:
-             image_public_url = None
-
-        course["image"] = image_public_url
+        # We now get the image_url directly from the parser (via OpenGraph)
+        # so we don't need to manually process media here for the website.
+        course["image"] = course.get("image_url")
 
         save_course(course, WEBSITE_API)
         
