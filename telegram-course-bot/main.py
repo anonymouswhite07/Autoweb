@@ -29,23 +29,25 @@ async def handler(event):
         # ✅ CREATE SLUG FIRST (CRITICAL)
         course["slug"] = slugify(course["title"])
 
-        # 🖼️ HANDLE IMAGE (Local Storage)
+        # 🖼️ HANDLE IMAGE (Base64 for MongoDB Storage)
         # Check if message has a photo to upload
         if event.message.photo:
             print("🖼️ Downloading image from Telegram...")
-            # Define path
-            file_name = f"{course['slug']}.jpg"
-            save_path = os.path.join("..", "app", "static", "images", file_name)
             
-            # Ensure directory exists
-            os.makedirs(os.path.dirname(save_path), exist_ok=True)
+            # Download image to memory (BytesIO)
+            from io import BytesIO
+            import base64
             
-            # Download
-            await client.download_media(event.message.photo, file=save_path)
+            image_bytes = BytesIO()
+            await client.download_media(event.message.photo, file=image_bytes)
+            image_bytes.seek(0)
             
-            # Save relative path to DB (compatible with our templates)
-            course["image"] = f"/static/images/{file_name}"
-            print(f"✅ Saved local image: {course['image']}")
+            # Convert to Base64
+            image_base64 = base64.b64encode(image_bytes.read()).decode('utf-8')
+            
+            # Create data URI for HTML img tag
+            course["image"] = f"data:image/jpeg;base64,{image_base64}"
+            print(f"✅ Image converted to Base64 (size: {len(image_base64)} chars)")
             
         else:
              # Fallback to OG if no photo
