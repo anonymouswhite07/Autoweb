@@ -6,10 +6,18 @@ from website import save_course
 from utils import slugify
 
 
-client = TelegramClient("user_session_clean", api_id, api_hash)
+# Global client removed to avoid event loop conflicts in threads
+# client = TelegramClient("user_session_clean", api_id, api_hash)
+# Handlers are now registered inside main()
 
-@client.on(events.NewMessage(chats=SOURCE_CHANNELS))
-async def handler(event):
+async def course_handler(event):
+    """
+    Event handler for new messages. 
+    Registered dynamically in main() to ensure robust loop handling.
+    """
+    # Access client from the event itself to avoid global scope issues
+    client = event.client
+    
     try:
         text = event.message.text
         # print(f"\n📩 New message received from {event.chat_id}")
@@ -66,16 +74,38 @@ async def handler(event):
         print("❌ ERROR in handler:", e)
 
 async def main():
+    """
+    Main entry point. Initializes client on the current running loop.
+    """
     print("👤 Authenticating with User Session...")
-    await client.start()
     
-    print(f"🤖 Connected to Telegram! Listening on {SOURCE_CHANNELS}...")
-    print("------------------------------------------------")
-    await client.run_until_disconnected()
+    # Initialize client HERE, inside the async function (uses current loop)
+    # Using 'with' block acts as start() and disconnect() automatically
+    async with TelegramClient("user_session_clean", api_id, api_hash) as client:
+        
+        # Register event handler dynamically
+        client.add_event_handler(course_handler, events.NewMessage(chats=SOURCE_CHANNELS))
+        
+        print(f"🤖 Connected to Telegram! Listening on {SOURCE_CHANNELS}...")
+        print("------------------------------------------------")
+        
+        # Keep running
+        await client.run_until_disconnected()
 
 def start_bot():
+    """
+    Entry point for external scripts (like web_bot.py).
+    Creates a new loop and runs the main async function.
+    """
     import asyncio
-    asyncio.run(main())
+    try:
+        asyncio.run(main())
+    except KeyboardInterrupt:
+        print("🛑 Bot stopped by user")
+    except Exception as e:
+        print(f"❌ Bot crashed: {e}")
+        # Re-raise to let the runner handle restarts if needed
+        raise e
 
 if __name__ == '__main__':
     start_bot()
