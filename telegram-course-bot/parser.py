@@ -1,6 +1,6 @@
 import re
 import requests
-import cloudscraper
+from curl_cffi import requests as cffi_requests
 from utils import udemy_slug_from_title, build_udemy_url
 from bs4 import BeautifulSoup
 
@@ -32,7 +32,7 @@ def udemy_url_exists(url: str) -> bool:
 def resolve_coursevania_link(url: str) -> str:
     """
     Follows a Coursevania link and extracts the actual Udemy URL.
-    Uses cloudscraper to bypass potential WAF/Cloudflare protections on Render/Cloud.
+    Uses curl_cffi to impersonate a real chrome browser (JA3 fingerprinting) to bypass WAFs.
     """
     try:
         if "coursevania.com" not in url:
@@ -40,17 +40,19 @@ def resolve_coursevania_link(url: str) -> str:
 
         print(f"🔄 Resolving Coursevania link: {url}")
         
-        # Use cloudscraper to mimic a real browser/bypass bot protection
-        scraper = cloudscraper.create_scraper()
-        
         # Try multiple times with increasing timeout
         for attempt in range(3):
             try:
-                timeout = 15 + (attempt * 5)  # 15s, 20s, 25s - slightly increased
-                print(f"  Attempt {attempt + 1}/3 (cloudscraper, timeout: {timeout}s)...")
+                timeout = 15 + (attempt * 5)
+                print(f"  Attempt {attempt + 1}/3 (curl_cffi, timeout: {timeout}s)...")
                 
-                # Cloudscraper automatically handles headers and some JS challenges
-                r = scraper.get(url, timeout=timeout, allow_redirects=True)
+                # impersonate="chrome" handles the TLS fingerprinting that cloudscraper misses
+                r = cffi_requests.get(
+                    url, 
+                    impersonate="chrome", 
+                    timeout=timeout, 
+                    allow_redirects=True
+                )
                 
                 if r.status_code == 200:
                     soup = BeautifulSoup(r.text, 'html.parser')
@@ -71,7 +73,6 @@ def resolve_coursevania_link(url: str) -> str:
                     break  # Don't retry if page loaded successfully
                     
             except Exception as e:
-                # Catching generic exception because cloudscraper might raise specific errors
                 print(f"  ⚠️ Error/Timeout on attempt {attempt + 1}: {e}")
                 if attempt == 2:
                     print("❌ All attempts failed")

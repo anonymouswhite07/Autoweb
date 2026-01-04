@@ -8,5 +8,5 @@ requests
 telethon
 googlesearch-python
 beautifulsoup4
-cloudscraper
+curl_cffi
 
