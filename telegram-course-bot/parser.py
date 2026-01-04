@@ -1,5 +1,6 @@
 import re
 import requests
+import cloudscraper
 from utils import udemy_slug_from_title, build_udemy_url
 from bs4 import BeautifulSoup
 
@@ -31,7 +32,7 @@ def udemy_url_exists(url: str) -> bool:
 def resolve_coursevania_link(url: str) -> str:
     """
     Follows a Coursevania link and extracts the actual Udemy URL.
-    Uses requests with retries as Playwright has network timeout issues.
+    Uses cloudscraper to bypass potential WAF/Cloudflare protections on Render/Cloud.
     """
     try:
         if "coursevania.com" not in url:
@@ -39,22 +40,17 @@ def resolve_coursevania_link(url: str) -> str:
 
         print(f"🔄 Resolving Coursevania link: {url}")
         
-        # Try with requests first (simpler and faster)
-        headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-            'Accept-Language': 'en-US,en;q=0.5',
-            'Connection': 'keep-alive',
-            'Upgrade-Insecure-Requests': '1'
-        }
+        # Use cloudscraper to mimic a real browser/bypass bot protection
+        scraper = cloudscraper.create_scraper()
         
         # Try multiple times with increasing timeout
         for attempt in range(3):
             try:
-                timeout = 10 + (attempt * 5)  # 10s, 15s, 20s
-                print(f"  Attempt {attempt + 1}/3 (timeout: {timeout}s)...")
+                timeout = 15 + (attempt * 5)  # 15s, 20s, 25s - slightly increased
+                print(f"  Attempt {attempt + 1}/3 (cloudscraper, timeout: {timeout}s)...")
                 
-                r = requests.get(url, headers=headers, timeout=timeout, allow_redirects=True)
+                # Cloudscraper automatically handles headers and some JS challenges
+                r = scraper.get(url, timeout=timeout, allow_redirects=True)
                 
                 if r.status_code == 200:
                     soup = BeautifulSoup(r.text, 'html.parser')
@@ -74,16 +70,11 @@ def resolve_coursevania_link(url: str) -> str:
                     print("⚠️ Page loaded but no Udemy link found")
                     break  # Don't retry if page loaded successfully
                     
-            except requests.Timeout:
-                print(f"  ⏱️ Timeout on attempt {attempt + 1}")
-                if attempt == 2:  # Last attempt
-                    print("❌ All attempts timed out")
-            except requests.ConnectionError as e:
-                print(f"  ❌ Connection error: {e}")
-                break  # Don't retry on connection errors
             except Exception as e:
-                print(f"  ⚠️ Error on attempt {attempt + 1}: {e}")
+                # Catching generic exception because cloudscraper might raise specific errors
+                print(f"  ⚠️ Error/Timeout on attempt {attempt + 1}: {e}")
                 if attempt == 2:
+                    print("❌ All attempts failed")
                     break
         
         print("⚠️ Returning original URL (resolution failed)")

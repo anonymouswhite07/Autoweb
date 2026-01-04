@@ -8,4 +8,5 @@ requests
 telethon
 googlesearch-python
 beautifulsoup4
+cloudscraper
 
