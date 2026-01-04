@@ -21,13 +21,11 @@ def slugify(text: str) -> str:
 # ============ COURSE OPERATIONS ============
 
 async def create_course_async(course_data: dict) -> dict:
-    """Create a new course (async)"""
+    """Create or update a course (async)"""
     slug = slugify(course_data.get("title", ""))
     
     # Check if course with this slug already exists
     existing = await courses_collection.find_one({"slug": slug})
-    if existing:
-        return existing
     
     course_doc = {
         "title": course_data.get("title"),
@@ -40,19 +38,34 @@ async def create_course_async(course_data: dict) -> dict:
         "udemy_link": course_data.get("udemy_link"),
         "created_at": datetime.utcnow()
     }
+
+    if existing:
+        # Update existing course
+        # Don't overwrite created_at
+        course_doc["updated_at"] = datetime.utcnow()
+        del course_doc["created_at"]
+        
+        # Only update fields that are present in course_data
+        update_fields = {k: v for k, v in course_doc.items() if v is not None}
+        
+        await courses_collection.update_one(
+            {"_id": existing["_id"]},
+            {"$set": update_fields}
+        )
+        # Return the updated document
+        course_doc["_id"] = existing["_id"]
+        return course_doc
     
     result = await courses_collection.insert_one(course_doc)
     course_doc["_id"] = result.inserted_id
     return course_doc
 
 def create_course_sync(course_data: dict) -> dict:
-    """Create a new course (sync)"""
+    """Create or update a course (sync)"""
     slug = slugify(course_data.get("title", ""))
     
     # Check if course with this slug already exists
     existing = sync_courses_collection.find_one({"slug": slug})
-    if existing:
-        return existing
     
     course_doc = {
         "title": course_data.get("title"),
@@ -65,6 +78,21 @@ def create_course_sync(course_data: dict) -> dict:
         "udemy_link": course_data.get("udemy_link"),
         "created_at": datetime.utcnow()
     }
+
+    if existing:
+        # Update existing course
+        # Don't overwrite created_at
+        course_doc["updated_at"] = datetime.utcnow()
+        del course_doc["created_at"]
+        
+        # Only update fields that are present in course_data
+        update_fields = {k: v for k, v in course_doc.items() if v is not None}
+        
+        sync_courses_collection.update_one(
+            {"_id": existing["_id"]},
+            {"$set": update_fields}
+        )
+        return course_doc
     
     result = sync_courses_collection.insert_one(course_doc)
     course_doc["_id"] = result.inserted_id

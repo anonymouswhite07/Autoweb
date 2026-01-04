@@ -7,3 +7,5 @@ python-dotenv
 requests
 telethon
 googlesearch-python
+beautifulsoup4
+

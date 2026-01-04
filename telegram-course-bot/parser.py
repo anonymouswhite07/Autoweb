@@ -1,6 +1,7 @@
 import re
 import requests
 from utils import udemy_slug_from_title, build_udemy_url
+from bs4 import BeautifulSoup
 
 def fetch_og_image(url: str) -> str:
     try:
@@ -26,6 +27,71 @@ def udemy_url_exists(url: str) -> bool:
         return r.status_code == 200
     except:
         return False
+
+def resolve_coursevania_link(url: str) -> str:
+    """
+    Follows a Coursevania link and extracts the actual Udemy URL.
+    Uses requests with retries as Playwright has network timeout issues.
+    """
+    try:
+        if "coursevania.com" not in url:
+            return url
+
+        print(f"🔄 Resolving Coursevania link: {url}")
+        
+        # Try with requests first (simpler and faster)
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+            'Accept-Language': 'en-US,en;q=0.5',
+            'Connection': 'keep-alive',
+            'Upgrade-Insecure-Requests': '1'
+        }
+        
+        # Try multiple times with increasing timeout
+        for attempt in range(3):
+            try:
+                timeout = 10 + (attempt * 5)  # 10s, 15s, 20s
+                print(f"  Attempt {attempt + 1}/3 (timeout: {timeout}s)...")
+                
+                r = requests.get(url, headers=headers, timeout=timeout, allow_redirects=True)
+                
+                if r.status_code == 200:
+                    soup = BeautifulSoup(r.text, 'html.parser')
+                    
+                    # Method 1: Look for "Get on Udemy" link
+                    anchor = soup.find('a', string=re.compile(r"Get on Udemy", re.IGNORECASE))
+                    if anchor and anchor.get('href'):
+                        print(f"✅ Found 'Get on Udemy' link: {anchor['href']}")
+                        return anchor['href']
+                    
+                    # Method 2: Look for any udemy.com/course link
+                    udemy_anchor = soup.find('a', href=re.compile(r"udemy\.com/course", re.IGNORECASE))
+                    if udemy_anchor and udemy_anchor.get('href'):
+                        print(f"✅ Found Udemy course link: {udemy_anchor['href']}")
+                        return udemy_anchor['href']
+                    
+                    print("⚠️ Page loaded but no Udemy link found")
+                    break  # Don't retry if page loaded successfully
+                    
+            except requests.Timeout:
+                print(f"  ⏱️ Timeout on attempt {attempt + 1}")
+                if attempt == 2:  # Last attempt
+                    print("❌ All attempts timed out")
+            except requests.ConnectionError as e:
+                print(f"  ❌ Connection error: {e}")
+                break  # Don't retry on connection errors
+            except Exception as e:
+                print(f"  ⚠️ Error on attempt {attempt + 1}: {e}")
+                if attempt == 2:
+                    break
+        
+        print("⚠️ Returning original URL (resolution failed)")
+        return url
+        
+    except Exception as e:
+        print(f"❌ Failed to resolve Coursevania link: {e}")
+        return url
 
 def extract_button_link(message):
     '''Extracts URL from message buttons if available.'''
@@ -121,13 +187,42 @@ def parse_course(message):
     title = lines[0].replace("**", "").strip()
     description = extract_description(lines)
 
-    # 0️⃣ PRIORITY: Extract Coupon & Build Link (Bypassing redirects)
+    # 0️⃣ PRIORITY: Check for Coursevania links FIRST
+    # This ensures we get the actual Udemy link with coupon from Coursevania
+    link_match = re.search(r"(https?://[^\s]+)", text)
+    if link_match:
+        link = link_match.group(1)
+        
+        # 🆕 Attempt to resolve if it's a Coursevania link
+        if "coursevania.com" in link:
+            print(f"📍 Found Coursevania link, extracting Udemy URL...")
+            resolved_link = resolve_coursevania_link(link)
+            if "udemy.com" in resolved_link:
+                print(f"✅ Coursevania extraction successful!")
+                return {
+                    "title": title,
+                    "description": description,
+                    "udemy_link": resolved_link,
+                    "status": "AUTO_RESOLVED",
+                    "image_url": fetch_og_image(resolved_link)
+                }
+        
+        # Check if it's a direct Udemy link
+        if "udemy.com/course" in link:
+            print(f"📍 Found direct Udemy link")
+            return {
+                "title": title,
+                "description": description,
+                "udemy_link": link,
+                "status": "AUTO",
+                "image_url": fetch_og_image(link)
+            }
+
+    # 1️⃣ FALLBACK: Extract Coupon & Build Link (only if no links found)
     coupon = extract_coupon_code(text)
     if coupon:
+        print(f"📍 No links found, building Udemy link from coupon code: {coupon}")
         direct_link = build_udemy_link(title, coupon)
-        # Verify it exists or just trust the construction?
-        # User said "Just make it work", implying trust the construction.
-        # But fetching OG image is still good practice.
         return {
             "title": title,
             "description": description,
@@ -136,25 +231,10 @@ def parse_course(message):
             "image_url": fetch_og_image(direct_link)
         }
 
-    # 1️⃣ Plain text link found in message body
-    # Prioritize Udemy links
-    udemy_match = re.search(r"(https?://www\.udemy\.com/course/[^\s]+)", text)
-    if udemy_match:
-        link = udemy_match.group(1)
-        return {
-            "title": title,
-            "description": description,
-            "udemy_link": link,
-            "status": "AUTO",
-            "image_url": fetch_og_image(link)
-        }
-    
-    # Check for other links if no udemy link
-    link_match = re.search(r"(https?://[^\s]+)", text)
+    # 2️⃣ If we found a link but it's not Coursevania or Udemy
     if link_match:
         link = link_match.group(1)
-        # If the user strictly wants NO Coursevania/Redirects, maybe we should skip this?
-        # But for now, keeping as fallback for non-coupon posts.
+        print(f"📍 Found other link: {link}")
         return {
             "title": title,
             "description": description,

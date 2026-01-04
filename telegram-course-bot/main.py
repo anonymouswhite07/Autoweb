@@ -34,6 +34,9 @@ async def course_handler(event):
             print("⚠️ Course ignored or needs manual review (No Link)")
             return
 
+        # 🔗 SHOW THE EXTRACTED UDEMY LINK
+        print(f"🔗 Udemy Link: {course.get('udemy_link')}")
+        
         # ✅ CREATE SLUG FIRST (CRITICAL)
         course["slug"] = slugify(course["title"])
 
