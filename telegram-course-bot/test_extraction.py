@@ -12,7 +12,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Test URL
-coursevania_url = "https://coursevania.com/courses/ai-for-beginners-learn-chatgpt-gemini-perplexity-and-grok/"
+coursevania_url = "https://coursevania.com/courses/ai-automation-and-agentic-ai-with-n8n-chatgpt-gen-ai/"
 
 print("=" * 60)
 print("TESTING COURSEVANIA LINK EXTRACTION")
