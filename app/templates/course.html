@@ -20,7 +20,10 @@
         {% endif %}
 
         <a href="{{ course.udemy_link }}" target="_blank" rel="noopener noreferrer" class="enroll-btn"
-            style="width: 100%; text-align: center; padding: 16px; font-size: 1.1rem;">
+            style="width: 100%; text-align: center; padding: 16px; font-size: 1.1rem;" onclick="gtag('event', 'get_course_click', {
+                'course_title': '{{ course.title }}',
+                'course_slug': '{{ course.slug }}'
+            });">
             Get Course Now
         </a>
     </div>

@@ -17,6 +17,7 @@ from .crud_mongo import (
     # Course operations
     create_course_sync, get_courses_sync, get_course_sync, 
     get_course_by_id_sync, update_course_sync, delete_course_sync,
+    delete_courses_by_days_sync,
     search_courses_sync,
     # Blog operations
     get_posts_sync, get_post_sync, get_post_by_id_sync,
@@ -425,6 +426,19 @@ async def admin_update_course(
 def admin_delete_course(id: str):
     delete_course_sync(id)
     return RedirectResponse("/admin", status_code=302)
+
+@app.delete("/admin/delete-days/{days}", dependencies=[Depends(admin_auth)])
+def delete_courses_by_days(days: int):
+    if days not in [5, 10, 20]:
+        return {"error": "Invalid range"}
+
+    deleted_count = delete_courses_by_days_sync(days)
+
+    return {
+        "status": "success",
+        "days": days,
+        "deleted": deleted_count
+    }
 
 # --- Admin Blog ---
 @app.get("/admin/blog", dependencies=[Depends(admin_auth)])

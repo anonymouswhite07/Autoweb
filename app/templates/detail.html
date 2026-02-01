@@ -40,7 +40,10 @@
 
         <div class="cta-section">
             <h3 style="margin-bottom: 1rem; color: #fff;">Ready to learn?</h3>
-            <a href="{{ course.udemy_link }}" target="_blank" rel="noopener noreferrer" class="get-course-btn">
+            <a href="{{ course.udemy_link }}" target="_blank" rel="noopener noreferrer" class="get-course-btn" onclick="gtag('event', 'get_course_click', {
+                 'course_title': '{{ course.title }}',
+                 'course_slug': '{{ course.slug }}'
+               });">
                 Get Course
             </a>
             <p style="margin-top: 1rem; font-size: 0.9rem; color: #64748b;">

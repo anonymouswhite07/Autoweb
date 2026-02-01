@@ -1,5 +1,5 @@
 from typing import List, Optional
-from datetime import datetime
+from datetime import datetime, timedelta
 import re
 from bson import ObjectId
 
@@ -156,6 +156,14 @@ def delete_course_sync(course_id: str) -> bool:
     """Delete a course (sync)"""
     result = sync_courses_collection.delete_one({"_id": ObjectId(course_id)})
     return result.deleted_count > 0
+
+def delete_courses_by_days_sync(days: int) -> int:
+    """Delete courses created in the last N days (sync)"""
+    cutoff = datetime.utcnow() - timedelta(days=days)
+    result = sync_courses_collection.delete_many({
+        "created_at": {"$gte": cutoff}
+    })
+    return result.deleted_count
 
 async def search_courses_async(query: str) -> List[dict]:
     """Search courses by title (async)"""

@@ -18,6 +18,74 @@
         </div>
     </div>
 
+    <!-- Cleanup Section -->
+    <div
+        style="background:var(--card-bg); padding:24px; border-radius:12px; margin-bottom:32px; border:1px solid #333;">
+        <h3 style="margin-bottom:16px; margin-top:0;">🧹 Cleanup Courses</h3>
+        <p style="margin-bottom:16px; color:var(--muted); font-size:14px;">Delete old courses to keep the database
+            clean. (Irreversible)</p>
+
+        <div style="display:flex; gap:12px; flex-wrap:wrap;">
+            <button onclick="deleteCourses(5)" class="danger-btn">Delete last 5 days</button>
+            <button onclick="deleteCourses(10)" class="danger-btn">Delete last 10 days</button>
+            <button onclick="deleteCourses(20)" class="danger-btn">Delete last 20 days</button>
+        </div>
+        <p id="delete-status" style="margin-top:16px; font-weight:bold; color:var(--accent-color);"></p>
+    </div>
+
+    <style>
+        .danger-btn {
+            background: #dc2626;
+            color: white;
+            padding: 10px 16px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+
+        .danger-btn:hover {
+            background: #b91c1c;
+        }
+    </style>
+
+    <script>
+        async function deleteCourses(days) {
+            const confirmDelete = confirm(
+                `⚠️ WARNING: Are you sure you want to PERMANENTLY delete all courses created in the last ${days} days?`
+            );
+
+            if (!confirmDelete) return;
+
+            const statusEl = document.getElementById("delete-status");
+            statusEl.innerText = "⏳ Deleting...";
+            statusEl.style.color = "var(--text)";
+
+            try {
+                const res = await fetch(`/admin/delete-days/${days}`, {
+                    method: "DELETE"
+                });
+
+                if (!res.ok) throw new Error("Failed to delete");
+
+                const data = await res.json();
+
+                statusEl.innerText = `✅ Success: Deleted ${data.deleted} courses from last ${days} days.`;
+                statusEl.style.color = "#22c55e";
+
+                // Optional: Reload after 2 seconds to reflect changes
+                setTimeout(() => window.location.reload(), 2000);
+
+            } catch (err) {
+                console.error(err);
+                statusEl.innerText = "❌ Error deleting courses. Check console.";
+                statusEl.style.color = "#ef4444";
+            }
+        }
+    </script>
+    <!-- End Cleanup Section -->
+
     {% for c in courses %}
     <div class="course-card" style="align-items:center;">
         <div style="flex:1;">
